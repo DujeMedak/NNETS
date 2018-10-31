@@ -1,0 +1,9 @@
+Model je treniran 15 epoha i spremljen u modelw_102.hp (tezine) i model_arh2.json (arhitektura) - dropbox
+Testiranje modela treba provesti sa slikama koje se nalaze u test direktoriju nakon izvodenja
+create(0.9, aid_dir='D:\AID') iz data_disposition (treba izvest sa prvim parametrom=0.9 jedino sto se u skripti treba mijenjat su putanje do dataseta)
+Model je treniran na 25 klasa pa treba rucno obrisati foldere :
+1.BareLand
+2.BaseballField
+3.Commercial
+4.Desert
+5.Resort
