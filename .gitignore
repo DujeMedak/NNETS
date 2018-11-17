@@ -2,3 +2,7 @@
 *.vscode*
 *source*
 *destination*
+*net_data*
+*AID*
+*.pyc
+*testground*
