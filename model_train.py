@@ -3,6 +3,20 @@ from keras_preprocessing.image import ImageDataGenerator,load_img
 import matplotlib.pyplot as plt
 import numpy as np
 import model_helper
+from keras.callbacks import Callback
+
+
+class WeightsSaver(Callback):
+  def __init__(self, N):
+    self.N = N
+    self.epoch = 1
+
+  def on_epoch_end(self, epoch, logs={}):
+    if self.epoch % self.N == 0:
+      name = 'weights%08d.h5' % self.epoch
+      # Save the model weights
+      model_helper.save_model__weights(model, weights_path=(trained_model_weights_path+name))
+    self.epoch += 1
 
 # Script for training the model. Training and validation images should be be in subfolders of directory specified in paths below.
 # Each subfolder name represents the name of the class.
@@ -10,19 +24,19 @@ train_dir = "D:\Data\TRAIN"
 validation_dir = "D:\Data\TEST"
 
 # saving paths
-trained_model_path = "model_arh2.json"
-trained_model_weights_path = "model_w_102.h5"
+trained_model_path = "model/test2-L2/model_arh.json"
+trained_model_weights_path = "model/test2-L2/"
 
 train_batchsize = 20
 val_batchsize = 5
 target_image_size = 128
-num_of_epochs = 15
+num_of_epochs = 16
 
 # change architecture in model helper if needed
 model = model_helper.create_model(n_classes=25)
 
 # TODO load all accuracy and loss infos from previous training if loading weights
-#model.load_weights('small_last4.h5')
+#model.load_weights('model_w_102.h5')
 
 # Show a summary of the model. Check the number of trainable parameters
 #model.summary()
@@ -30,8 +44,8 @@ model = model_helper.create_model(n_classes=25)
 train_datagen = ImageDataGenerator(
       rescale=1./255,
       rotation_range=20,
-      width_shift_range=0.2,
-      height_shift_range=0.2,
+      width_shift_range=0.25,
+      height_shift_range=0.25,
       horizontal_flip=True,
       fill_mode='nearest')
 
@@ -52,7 +66,7 @@ validation_generator = validation_datagen.flow_from_directory(
 
 # Compile the model
 model.compile(loss='categorical_crossentropy',
-              optimizer=optimizers.RMSprop(lr=1e-4),
+              optimizer=optimizers.RMSprop(lr=5e-5),
               metrics=['acc'])
 
 # Train the model
@@ -62,10 +76,11 @@ history = model.fit_generator(
     epochs=num_of_epochs,
     validation_data=validation_generator,
     validation_steps=validation_generator.samples / validation_generator.batch_size,
-    verbose=1)
+    verbose=1,
+    callbacks=[WeightsSaver(2)])
+#save weights every 2 epochs
 
-# Save the model
-model_helper.save_model_and_weights(model, saving_model_path=trained_model_path, weights_path = trained_model_weights_path)
+#model_helper.save_model__weights(model, saving_model_path=trained_model_path, weights_path=trained_model_weights_path)
 
 acc = history.history['acc']
 val_acc = history.history['val_acc']
@@ -118,14 +133,14 @@ print("No of errors = {}/{}".format(len(errors), validation_generator.samples))
 
 print("saving to txt files (acc,values")
 numpy_acc = np.array(acc)
-np.savetxt("acc_history.txt", numpy_acc, delimiter=",")
-numpy_acc_val = np.array(acc)
-np.savetxt("acc_val_history.txt", numpy_acc_val, delimiter=",")
+np.savetxt("plots/test2/acc_history.txt", numpy_acc, delimiter=",")
+numpy_acc_val = np.array(val_acc)
+np.savetxt("plots/test2/acc_val_history.txt", numpy_acc_val, delimiter=",")
 
-numpy_loss = np.array(acc)
-np.savetxt("loss_history.txt", numpy_loss, delimiter=",")
-numpy_loss_val = np.array(acc)
-np.savetxt("loss_val_history.txt", numpy_loss_val, delimiter=",")
+numpy_loss = np.array(loss)
+np.savetxt("plots/test2/loss_history.txt", numpy_loss, delimiter=",")
+numpy_loss_val = np.array(val_loss)
+np.savetxt("plots/test2/loss_val_history.txt", numpy_loss_val, delimiter=",")
 
 # Show the errors
 for i in range(len(errors)):
