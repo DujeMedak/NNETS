@@ -53,14 +53,15 @@ def load_sections(output_map_sections_path,
                   target_section_width = 128,
                   target_section_height = 128):
 
-    tf_image_data_gen = ImageDataGenerator()
+    tf_image_data_gen = ImageDataGenerator(rescale=1. / 255)
 
     tf_image_data = tf_image_data_gen.flow_from_directory(
         output_map_sections_path,
         target_size = (target_section_height, target_section_width),
         class_mode = None,
         batch_size = test_batchsize,
-        shuffle = False
+        shuffle = False,
+        save_to_dir='./Data/my_test'
     )
 
     return tf_image_data
