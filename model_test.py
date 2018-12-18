@@ -1,14 +1,21 @@
 from keras_preprocessing.image import ImageDataGenerator, load_img
+
+import sys
+if sys.platform[0] == 'w':
+    import matplotlib
+    matplotlib.use('agg')
+
 import matplotlib.pyplot as plt
 import numpy as np
 import model_helper
 
 # Script for testing the model. Testing images should be be in subfolders of directory specified in test_path.
 # Each subfolder name represents the name of the class.
-test_path = "D:\Data\TEST"
+test_path = "Data\\TEST"
 trained_model_path = "model/test2-L2/model_arh2.json"
 #trained_model_weights_path = "model/test1-dropout/model_w_103.h5"
 trained_model_weights_path = "model/test2-L2/weights00000016.h5"
+#trained_model_weights_path = "net_data/model_w_102.h5"
 target_image_size = 128
 test_batchsize = 1
 
@@ -58,6 +65,7 @@ for pred in predictions:
 if len(errors) == 0:
     exit(0)
 
+print("Error confidences:")
 sum_err_conf = 0
 for i in range(len(errors)):
     pred_class = np.argmax(predictions[errors[i]])
@@ -66,11 +74,12 @@ for i in range(len(errors)):
     original_label = fnames[errors[i]].split('r\\')[0]
     conf = predictions[errors[i]][pred_class]
     conf_sorted = np.sort(predictions[errors[i]])
-    top3 = np.flip(conf_sorted[-3:])
+    top3 = np.flip(conf_sorted[-3:], 0)
     sum_err_conf += top3[0]
     print("CLASS:",original_label)
     print("conf",conf,"conf3",top3)
 
+print("Correct confidences")
 sum_corr_conf = 0
 for i in range(len(correct)):
     pred_class = np.argmax(predictions[correct[i]])
@@ -79,7 +88,7 @@ for i in range(len(correct)):
     original_label = fnames[correct[i]].split('r\\')[0]
     conf = predictions[correct[i]][pred_class]
     conf_sorted = np.sort(predictions[correct[i]])
-    top3 = np.flip(conf_sorted[-3:])
+    top3 = np.flip(conf_sorted[-3:], 0)
     sum_corr_conf += top3[0]
     print("CLASS:",original_label)
     print("conf",conf,"conf3",top3)
